@@ -20,7 +20,7 @@ void await() {
     std::cin.get();
 }
 
-int accountRegister() {
+BankAccount accountRegister() {
     system("CLS");
     if (exists("users.json")) {
         std::cout << "User data found! Press enter to continue" << std::endl;
@@ -34,6 +34,9 @@ int accountRegister() {
     json j;
 
     std::string username;
+
+    std::cout << "Registering account:" << std::endl;
+    std::cout << "--------------------" << std::endl;
     while (true) {
         std::cout << "Enter your username:" << std::endl;
         std::cin >> username;
@@ -106,6 +109,7 @@ int accountRegister() {
         if (!(std::cin >> balance)) {
             std::cout << "Invalid amount.";
         } else {
+            balance = balance * 100;
             break;
         }
     }
@@ -115,16 +119,19 @@ int accountRegister() {
     newAccount.saveToJSON();
     std::cout << "Registered succesfully!";
     await();
-
-    return 0;
+    return newAccount;
 }
 
-int accountLogin() {
+BankAccount accountLogin() {
     system("CLS");
 
+    BankAccount LoggedInAccount;
     std::ifstream file("users.json");
 
     json j = json::parse(file);
+
+    std::cout << "Logging in account:" << std::endl;
+    std::cout << "-------------------" << std::endl;
     
     while (true) {
         std::cout << "Enter your username:" << std::endl;
@@ -136,24 +143,70 @@ int accountLogin() {
         std::cin >> password;
         
         bool login = false;
-
+        std::string accountNumber;
+        
         for (auto& [key, user] : j.items()) {
             if (user["username"] == username && user["password"] == password) {
+                accountNumber = key;
                 login = true;
+                break;
             }
         }
         
         if (login == true) {
-            std::cout << "Login succesfull!";
+            for (auto& [key, user] : j.items()) {
+                if (key == accountNumber) {
+                    LoggedInAccount = BankAccount(user["username"], user["password"], user["accountHolderName"], user["balance"]);
+                    break;
+                }
+            }
+            std::cout << "Login succesfull!" << std::endl;
+            std::cout << "Welcome " << LoggedInAccount.getAccountHolderName() << ".";
             await();
             system("CLS");
+            return LoggedInAccount;
             break;
         } else {
-            std::cout << "Invalid login!";
+            std::cout << "Invalid username or password login!";
             await();
             system("CLS");
         }
     }
+}
+
+int menu(BankAccount account) {
+    while (true) {
+        system("CLS");
+        int choice;
+        bool logOut = false;
+
+        account.accountMenu(account);
+
+        std::cout << "1. Deposit money to account." << std::endl;
+        std::cout << "2. Withdraw money from account." << std::endl;
+        std::cout << "3. Logout." << std::endl;
+        std::cout << "--------------------------------" << std::endl;
+        while (true) {
+            std::cin >> choice;
+            switch (choice) {
+                case 1:
+                    std::cout << "WIP" << std::endl;
+                    break;
+                case 2:
+                    std::cout << "WIP" << std::endl;
+                    break;
+                case 3:
+                    std::cout << "Logging out..." << std::endl;
+                    logOut = true;
+                    break;
+                default:
+                    std::cout << "Invalid option" << std::endl;
+            }
+            if (logOut) break;
+        }
+        if (logOut) break;
+    }
+    
     return 0;
 }
 
@@ -164,19 +217,19 @@ int main() {
         std::cout << "Would you like to login or register?\n1.Login\n2.Register\n3.Exit\n";
 
         while (true) {
-            std::cin >> choice;
-            if (choice == 1) {
-                accountLogin();
-                break;
-            } else if (choice == 2) {
-                accountRegister();
-                break;
-            } else if (choice == 3) {
-                abort();
-            } else {
-                std::cout << "Invalid option\n";
-            }
+        std::cin >> choice;
+
+        if (choice == 1) {
+            menu(accountLogin());
+            break;
+        } else if (choice == 2) {
+            menu(accountRegister());
+            break;
+        } else if (choice == 3) {
+            return 0;
+        } else {
+            std::cout << "Invalid option\n";
         }
     }
-    return 0;
+    }
 }

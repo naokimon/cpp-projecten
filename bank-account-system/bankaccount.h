@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include "json.hpp"
 #include <fstream>
 
@@ -45,5 +47,28 @@ class BankAccount {
 
     void withdraw(int amount) {
         balance -= amount;
+    }
+
+    std::string getAccountHolderName() {
+        return accountHolderName;
+    }
+    
+    std::string getUsername() {
+        return username;
+    }
+
+    std::string getBalance() {
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(2) << balance / 100.00;
+        return oss.str();
+    }
+
+    void accountMenu(BankAccount account) {
+        std::cout << "Menu" << std::endl;
+        std::cout << "--------------------------------" << std::endl;
+        std::cout << "Username: " << account.getUsername() << std::endl;
+        std::cout << "Account Holder: " << account.getAccountHolderName() << std::endl;
+        std::cout << "Account Balance: $" << account.getBalance() << std::endl;
+        std::cout << "--------------------------------" << std::endl;
     }
 };

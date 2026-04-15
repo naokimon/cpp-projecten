@@ -1,8 +1,14 @@
 {
-  "1": {
-    "accountHolderName": "Nathan Cruz Martinez",
-    "balance": 1000000,
-    "password": "Password",
-    "username": "Naokimon"
-  }
+    "1": {
+        "accountHolderName": "Nathan Cruz Martinez",
+        "balance": 1000011,
+        "password": "Password",
+        "username": "Naokimon"
+    },
+    "2": {
+        "accountHolderName": "Noethan Croez Martoenez",
+        "balance": 10000,
+        "password": "Password",
+        "username": "noekimon"
+    }
 }
