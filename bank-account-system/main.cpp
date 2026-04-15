@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "json.hpp"
+#include "bankaccount.h"
 
 using json = nlohmann::json;
 
@@ -14,20 +15,24 @@ inline bool exists (const std::string& name) {
     return false;
 }
 
-int userRegister() {
+void await() {
+    std::cin.ignore();
+    std::cin.get();
+}
+
+int accountRegister() {
     system("CLS");
     if (exists("users.json")) {
         std::cout << "User data found! Press enter to continue" << std::endl;
-        std::cin.ignore();
-        std::cin.get();
+        await();
     } else {
         std::cout << "User data not found. Creating data..." << std::endl;
-        std::cin.ignore();
-        std::cin.get();
+        await();
     }
     
     system("CLS");
     json j;
+
     std::string username;
     while (true) {
         std::cout << "Enter your username:" << std::endl;
@@ -53,7 +58,7 @@ int userRegister() {
     std::string password;
     while (true) {
         std::cout << "Enter your password:" << std::endl;
-        std:: cin >> password;
+        std::cin >> password;
 
         std::string confirmPassword;
         std::cout << "Confirm password:" << std::endl;
@@ -66,25 +71,55 @@ int userRegister() {
         }
     }
 
+    std::string accountHolderName;
+    while (true) {
+        std::string firstName;
+        while (true) {
+            std::cout << "Enter your first name:" << std::endl;
+            std::cin >> firstName;
+            std::cin.ignore();
+            if (firstName.length() == 0) {
+                std::cout << "Please enter a name." << std::endl;
+            } else {
+                break;
+            }
+        }
 
-    std::ifstream inFile("users.json");
-
-    if (inFile.is_open() && inFile.peek() != std::ifstream::traits_type::eof()) {
-        inFile >> j;
+        std::string lastName;
+        while (true) {
+            std::cout << "Enter your last name:" << std::endl;
+            std::getline(std::cin, lastName);
+            if (lastName.length() == 0) {
+                std::cout << "Please enter a last name." << std::endl;
+            } else {
+                break;
+            }
+        }
+        
+        accountHolderName = firstName + " " + lastName;
+        break;
     }
-    inFile.close();
 
-    j[std::to_string(j.size() + 1)] = {{"password", password}, {"username", username}};
-    std::ofstream outFile("users.json");
-    outFile << j.dump(2);
-    outFile.close();
-    std::cout << "Registered succesfully" << std::endl;
-    std::cin.ignore();
-    std::cin.get(); 
+    long long balance;
+    while (true) {
+        std::cout << "Enter your initial deposit:" << std::endl;
+        if (!(std::cin >> balance)) {
+            std::cout << "Invalid amount.";
+        } else {
+            break;
+        }
+    }
+
+    BankAccount newAccount(username, password, accountHolderName, balance);
+
+    newAccount.saveToJSON();
+    std::cout << "Registered succesfully!";
+    await();
+
     return 0;
 }
 
-int userLogin() {
+int accountLogin() {
     system("CLS");
 
     std::ifstream file("users.json");
@@ -110,14 +145,12 @@ int userLogin() {
         
         if (login == true) {
             std::cout << "Login succesfull!";
-            std::cin.ignore();
-            std::cin.get();
+            await();
             system("CLS");
             break;
         } else {
             std::cout << "Invalid login!";
-            std::cin.ignore();
-            std::cin.get();
+            await();
             system("CLS");
         }
     }
@@ -133,10 +166,10 @@ int main() {
         while (true) {
             std::cin >> choice;
             if (choice == 1) {
-                userLogin();
+                accountLogin();
                 break;
             } else if (choice == 2) {
-                userRegister();
+                accountRegister();
                 break;
             } else if (choice == 3) {
                 abort();
